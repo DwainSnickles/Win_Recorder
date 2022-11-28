@@ -30,6 +30,7 @@ namespace Win_Recorder
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRecorder));
             this.lblMessage = new System.Windows.Forms.Label();
             this.tmrCountDown = new System.Windows.Forms.Timer(this.components);
             this.lblCountDown = new System.Windows.Forms.Label();
@@ -94,10 +95,11 @@ namespace Win_Recorder
             this.Controls.Add(this.lblFullScreenMessage);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.lblCountDown);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Name = "frmRecorder";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "Main Recorder Screen";
             this.TopMost = true;
             this.TransparencyKey = System.Drawing.Color.Snow;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmRecorder_FormClosing);
