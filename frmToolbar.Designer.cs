@@ -32,7 +32,6 @@ namespace Win_Recorder
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmToolbar));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnExit = new System.Windows.Forms.ImageButton();
             this.pnlControls = new System.Windows.Forms.Panel();
             this.btnSpeaker = new System.Windows.Forms.ImageButton();
             this.btnOpenVideoPath = new System.Windows.Forms.ImageButton();
@@ -43,6 +42,7 @@ namespace Win_Recorder
             this.labelTimestamp = new System.Windows.Forms.Label();
             this.btnStartStop = new System.Windows.Forms.ImageButton();
             this.btnPause = new System.Windows.Forms.ImageButton();
+            this.btnExit = new System.Windows.Forms.ImageButton();
             this.tmrElapsedTime = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.mnuRecentVideos = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,22 +50,31 @@ namespace Win_Recorder
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCustomSize = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuFullScreen = new System.Windows.Forms.ToolStripMenuItem();
-            this.lblStatus = new System.Windows.Forms.Label();
+            this.pnlWebCamera = new System.Windows.Forms.Panel();
+            this.btnStartWebCam = new System.Windows.Forms.ImageButton();
+            this.cboCameras = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.ckbUseWebCam = new System.Windows.Forms.CheckBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnExit)).BeginInit();
             this.pnlControls.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnSpeaker)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnOpenVideoPath)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnStartStop)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnPause)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnExit)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.pnlWebCamera.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.btnStartWebCam)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.btnExit);
             this.panel1.Controls.Add(this.pnlControls);
             this.panel1.Controls.Add(this.txtVideoName);
             this.panel1.Controls.Add(this.label2);
@@ -76,23 +85,8 @@ namespace Win_Recorder
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(374, 40);
+            this.panel1.Size = new System.Drawing.Size(359, 40);
             this.panel1.TabIndex = 9;
-            // 
-            // btnExit
-            // 
-            this.btnExit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.btnExit.DialogResult = System.Windows.Forms.DialogResult.None;
-            this.btnExit.DownImage = null;
-            this.btnExit.HoverImage = null;
-            this.btnExit.Location = new System.Drawing.Point(329, 4);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.NormalImage = global::Win_Recorder.Properties.Resources.Exit;
-            this.btnExit.Size = new System.Drawing.Size(40, 30);
-            this.btnExit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.btnExit.TabIndex = 35;
-            this.btnExit.TabStop = false;
-            this.btnExit.Tag = "Start";
             // 
             // pnlControls
             // 
@@ -118,6 +112,7 @@ namespace Win_Recorder
             this.btnSpeaker.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.btnSpeaker.TabIndex = 27;
             this.btnSpeaker.TabStop = false;
+            this.toolTip1.SetToolTip(this.btnSpeaker, "Turn speakers on off.");
             this.btnSpeaker.Click += new System.EventHandler(this.btnSpeaker_Click);
             // 
             // btnOpenVideoPath
@@ -133,6 +128,7 @@ namespace Win_Recorder
             this.btnOpenVideoPath.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.btnOpenVideoPath.TabIndex = 29;
             this.btnOpenVideoPath.TabStop = false;
+            this.toolTip1.SetToolTip(this.btnOpenVideoPath, "Open video folder select video and it will start playing the video");
             this.btnOpenVideoPath.Click += new System.EventHandler(this.btnSaveVideoPath_Click);
             // 
             // btnMic
@@ -148,15 +144,17 @@ namespace Win_Recorder
             this.btnMic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.btnMic.TabIndex = 28;
             this.btnMic.TabStop = false;
+            this.toolTip1.SetToolTip(this.btnMic, "Turn Microphone on off.");
             this.btnMic.Click += new System.EventHandler(this.btnMic_Click);
             // 
             // txtVideoName
             // 
             this.txtVideoName.Location = new System.Drawing.Point(177, 16);
             this.txtVideoName.Name = "txtVideoName";
-            this.txtVideoName.Size = new System.Drawing.Size(77, 20);
+            this.txtVideoName.Size = new System.Drawing.Size(101, 20);
             this.txtVideoName.TabIndex = 11;
             this.txtVideoName.Text = "VideoName";
+            this.txtVideoName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
             // 
@@ -172,9 +170,9 @@ namespace Win_Recorder
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(181, 2);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 13);
+            this.label1.Size = new System.Drawing.Size(93, 13);
             this.label1.TabIndex = 10;
-            this.label1.Text = "Video Name";
+            this.label1.Text = "Enter Video Name";
             // 
             // labelTimestamp
             // 
@@ -193,7 +191,7 @@ namespace Win_Recorder
             this.btnStartStop.DialogResult = System.Windows.Forms.DialogResult.None;
             this.btnStartStop.DownImage = null;
             this.btnStartStop.HoverImage = null;
-            this.btnStartStop.Location = new System.Drawing.Point(297, 4);
+            this.btnStartStop.Location = new System.Drawing.Point(316, 4);
             this.btnStartStop.Name = "btnStartStop";
             this.btnStartStop.NormalImage = ((System.Drawing.Image)(resources.GetObject("btnStartStop.NormalImage")));
             this.btnStartStop.Size = new System.Drawing.Size(30, 30);
@@ -201,6 +199,7 @@ namespace Win_Recorder
             this.btnStartStop.TabIndex = 32;
             this.btnStartStop.TabStop = false;
             this.btnStartStop.Tag = "Start";
+            this.toolTip1.SetToolTip(this.btnStartStop, "Start / Stop Video Recording");
             this.btnStartStop.Click += new System.EventHandler(this.btnStartStop_Click);
             // 
             // btnPause
@@ -209,14 +208,32 @@ namespace Win_Recorder
             this.btnPause.DialogResult = System.Windows.Forms.DialogResult.None;
             this.btnPause.DownImage = null;
             this.btnPause.HoverImage = null;
-            this.btnPause.Location = new System.Drawing.Point(264, 4);
+            this.btnPause.Location = new System.Drawing.Point(284, 4);
             this.btnPause.Name = "btnPause";
             this.btnPause.NormalImage = ((System.Drawing.Image)(resources.GetObject("btnPause.NormalImage")));
             this.btnPause.Size = new System.Drawing.Size(30, 30);
             this.btnPause.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.btnPause.TabIndex = 31;
             this.btnPause.TabStop = false;
+            this.toolTip1.SetToolTip(this.btnPause, "Pause the video in progress");
             this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
+            // 
+            // btnExit
+            // 
+            this.btnExit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.btnExit.DialogResult = System.Windows.Forms.DialogResult.None;
+            this.btnExit.DownImage = null;
+            this.btnExit.HoverImage = null;
+            this.btnExit.Location = new System.Drawing.Point(315, 3);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.NormalImage = global::Win_Recorder.Properties.Resources.Exit;
+            this.btnExit.Size = new System.Drawing.Size(33, 30);
+            this.btnExit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.btnExit.TabIndex = 35;
+            this.btnExit.TabStop = false;
+            this.btnExit.Tag = "Start";
+            this.toolTip1.SetToolTip(this.btnExit, "Close Screen Recorder");
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // tmrElapsedTime
             // 
@@ -230,15 +247,16 @@ namespace Win_Recorder
             this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(374, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(359, 24);
             this.menuStrip1.TabIndex = 13;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // mnuRecentVideos
             // 
             this.mnuRecentVideos.Name = "mnuRecentVideos";
-            this.mnuRecentVideos.Size = new System.Drawing.Size(121, 20);
-            this.mnuRecentVideos.Text = "View Recent Videos";
+            this.mnuRecentVideos.Size = new System.Drawing.Size(118, 20);
+            this.mnuRecentVideos.Text = "Play Recent Videos";
+            this.mnuRecentVideos.MouseEnter += new System.EventHandler(this.mnuRecentVideos_MouseEnter);
             // 
             // fileToolStripMenuItem
             // 
@@ -271,21 +289,90 @@ namespace Win_Recorder
             this.mnuFullScreen.Text = "Full Screen";
             this.mnuFullScreen.Click += new System.EventHandler(this.fullScreenToolStripMenuItem_Click);
             // 
+            // pnlWebCamera
+            // 
+            this.pnlWebCamera.Controls.Add(this.btnExit);
+            this.pnlWebCamera.Controls.Add(this.btnStartWebCam);
+            this.pnlWebCamera.Controls.Add(this.cboCameras);
+            this.pnlWebCamera.Controls.Add(this.label3);
+            this.pnlWebCamera.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlWebCamera.Location = new System.Drawing.Point(0, 64);
+            this.pnlWebCamera.Name = "pnlWebCamera";
+            this.pnlWebCamera.Size = new System.Drawing.Size(359, 40);
+            this.pnlWebCamera.TabIndex = 15;
+            // 
+            // btnStartWebCam
+            // 
+            this.btnStartWebCam.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.btnStartWebCam.DialogResult = System.Windows.Forms.DialogResult.None;
+            this.btnStartWebCam.DownImage = null;
+            this.btnStartWebCam.HoverImage = null;
+            this.btnStartWebCam.Location = new System.Drawing.Point(282, 3);
+            this.btnStartWebCam.Name = "btnStartWebCam";
+            this.btnStartWebCam.NormalImage = global::Win_Recorder.Properties.Resources.editor_png_image_editing_512;
+            this.btnStartWebCam.Size = new System.Drawing.Size(30, 30);
+            this.btnStartWebCam.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.btnStartWebCam.TabIndex = 33;
+            this.btnStartWebCam.TabStop = false;
+            this.btnStartWebCam.Tag = "Start";
+            this.toolTip1.SetToolTip(this.btnStartWebCam, "Start Camera to make adjustments before starting recording");
+            this.btnStartWebCam.Click += new System.EventHandler(this.btnStartWebCam_Click);
+            // 
+            // cboCameras
+            // 
+            this.cboCameras.FormattingEnabled = true;
+            this.cboCameras.Location = new System.Drawing.Point(86, 11);
+            this.cboCameras.Name = "cboCameras";
+            this.cboCameras.Size = new System.Drawing.Size(190, 21);
+            this.cboCameras.TabIndex = 3;
+            this.cboCameras.SelectedIndexChanged += new System.EventHandler(this.cboCameras_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(1, 14);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(79, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Select Camera:";
+            // 
+            // ckbUseWebCam
+            // 
+            this.ckbUseWebCam.AutoSize = true;
+            this.ckbUseWebCam.Location = new System.Drawing.Point(245, 5);
+            this.ckbUseWebCam.Name = "ckbUseWebCam";
+            this.ckbUseWebCam.Size = new System.Drawing.Size(110, 17);
+            this.ckbUseWebCam.TabIndex = 22;
+            this.ckbUseWebCam.Text = "Use Web Camera";
+            this.toolTip1.SetToolTip(this.ckbUseWebCam, "Uses the PC Camera and displays it in video.");
+            this.ckbUseWebCam.UseVisualStyleBackColor = true;
+            this.ckbUseWebCam.CheckedChanged += new System.EventHandler(this.ckbUseWebCam_CheckedChanged);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 104);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(359, 22);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.TabIndex = 16;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
             // lblStatus
             // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(12, 67);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(71, 13);
-            this.lblStatus.TabIndex = 14;
+            this.lblStatus.Size = new System.Drawing.Size(76, 17);
             this.lblStatus.Text = "Recorder Idle";
             // 
             // frmToolbar
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(374, 83);
-            this.Controls.Add(this.lblStatus);
+            this.ClientSize = new System.Drawing.Size(359, 126);
+            this.Controls.Add(this.ckbUseWebCam);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.pnlWebCamera);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -298,17 +385,23 @@ namespace Win_Recorder
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmToolbar_FormClosing);
             this.Load += new System.EventHandler(this.frmToolbar_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmToolbar_KeyDown);
+            this.MouseEnter += new System.EventHandler(this.frmToolbar_MouseEnter);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.btnExit)).EndInit();
             this.pnlControls.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.btnSpeaker)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnOpenVideoPath)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnMic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnStartStop)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnPause)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnExit)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.pnlWebCamera.ResumeLayout(false);
+            this.pnlWebCamera.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.btnStartWebCam)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -332,8 +425,15 @@ namespace Win_Recorder
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mnuCustomSize;
         private System.Windows.Forms.ToolStripMenuItem mnuFullScreen;
-        private System.Windows.Forms.Label lblStatus;
         public System.Windows.Forms.ImageButton btnStartStop;
         public System.Windows.Forms.ImageButton btnExit;
+        private System.Windows.Forms.Panel pnlWebCamera;
+        private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.ImageButton btnStartWebCam;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        internal System.Windows.Forms.ComboBox cboCameras;
+        private System.Windows.Forms.CheckBox ckbUseWebCam;
     }
 }

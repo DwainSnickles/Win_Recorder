@@ -1,15 +1,14 @@
-﻿using ScreenRecorderLib;
+﻿using AForge.Video;
+using AForge.Video.DirectShow;
+using ControlManager;
+using ScreenRecorderLib;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Win_Recorder
@@ -52,7 +51,7 @@ namespace Win_Recorder
             SetWindowLong(this.Handle, GWL.ExStyle, wl);
         }
 
-        ReSize resize = new ReSize();
+        //ReSize resize = new ReSize();
         private const int cGrip = 16;      // Grip size
         private const int cCaption = 4;   // Caption bar height;
         private const int GWL_EXSTYLE = (-20);
@@ -101,37 +100,7 @@ namespace Win_Recorder
 
         public bool? SpeakersOn { get; private set; }
         public bool? MicrophoneOn { get; private set; }
-
-        //
-        //override  WndProc  
-        //
-        protected override void WndProc(ref Message m)
-        {
-            //****************************************************************************
-
-            int x = (int)(m.LParam.ToInt64() & 0xFFFF);               //get x mouse position
-            int y = (int)((m.LParam.ToInt64() & 0xFFFF0000) >> 16);   //get y mouse position  you can gave (x,y) it from "MouseEventArgs" too
-            Point pt = PointToClient(new Point(x, y));
-
-            if (m.Msg == 0x84)
-            {
-                switch (resize.getMosuePosition(pt, this))
-                {
-                    case "l": m.Result = (IntPtr)10; return;  // the Mouse on Left Form
-                    case "r": m.Result = (IntPtr)11; return;  // the Mouse on Right Form
-                    case "a": m.Result = (IntPtr)12; return;
-                    case "la": m.Result = (IntPtr)13; return;
-                    case "ra": m.Result = (IntPtr)14; return;
-                    case "u": m.Result = (IntPtr)15; return;
-                    case "lu": m.Result = (IntPtr)16; return;
-                    case "ru": m.Result = (IntPtr)17; return; // the Mouse on Right_Under Form
-                    case "": m.Result = pt.Y < 32 /*mouse on title Bar*/ ? (IntPtr)2 : (IntPtr)1; return;
-
-                }
-            }
-
-            base.WndProc(ref m);
-        }
+       
 
         #endregion
         #region Screen Recorder Classes
@@ -239,7 +208,11 @@ namespace Win_Recorder
         //used for passing variables to toolbar form
         public delegate void SetValueDelegate(string value);
         public SetValueDelegate CallToolbarForm;
-        
+
+        public FilterInfoCollection filterInfoCollection { get; internal set; }
+
+        VideoCaptureDevice videoCaptureDevice;
+
         public frmRecorder()
         {
             InitializeComponent();
@@ -253,15 +226,23 @@ namespace Win_Recorder
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Enabled resising and moving Click through disabled
             this.SetStyle(ControlStyles.ResizeRedraw, true);
-            lblCountDown.Visible = false;
-            lblMessage.Visible = false;
+            //lblCountDown.Visible = false;
+            //lblMessage.Visible = false;
             videoFolder = Path.Combine(Application.ExecutablePath, "\\Videos");
             Properties.Settings.Default._VideoFolder = videoFolder;
             Properties.Settings.Default.Save();
             RecordFullscreen = false;
             formStartPosition = this.Location;
+            filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            foreach (FilterInfo filterInfo in filterInfoCollection)
+            {
+                cboCameras.Items.Add(filterInfo.Name);
+            }
+
+            cboCameras.SelectedIndex = 0;
+            videoCaptureDevice = new VideoCaptureDevice();
+            ControlMoverOrResizer.Init(webCam1);
         }
 
         public void PauseVideo()
@@ -274,6 +255,17 @@ namespace Win_Recorder
                     return;
                 }
             _rec.Pause();
+        }
+
+        internal void DisableWebCam()
+        {
+            webCam1.Visible = false;
+            videoCaptureDevice.Stop();
+        }
+
+        internal void EnableWebCam()
+        {
+            webCam1.Visible = true;
         }
 
         internal void Record()
@@ -361,6 +353,28 @@ namespace Win_Recorder
             this.Activate();
         }
 
+        internal void DiableWebCam()
+        {
+            webCam1.Visible = false;
+        }
+
+        internal void SetCboIndex(int cboIndex)
+        {
+            try
+            {
+                if (cboCameras.SelectedIndex > -1)
+                {
+                    cboCameras.SelectedIndex = cboIndex;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
         internal void AllowResizing()
         {
             if (RecordFullscreen)
@@ -381,6 +395,7 @@ namespace Win_Recorder
                 ScreenTop = ScreenRectangle.Y;
                 ScreenWidth = ScreenRectangle.Width;
                 ScreenHeight = ScreenRectangle.Height;
+                lblFullScreenMessage.Visible = false;
             }
             SetWindowLong(this.Handle, GWL_EXSTYLE, GetWindowLong(this.Handle, GWL_EXSTYLE) | WS_EX_TRANSPARENT);
             lblCountDown.Visible = true;
@@ -393,15 +408,20 @@ namespace Win_Recorder
             //This is the 5 sec Count down timer before recording (tmrCountDown)
             CountDown--;
             lblCountDown.Text = CountDown.ToString();
+
             if (CountDown == 0)
             {
                 lblCountDown.Visible = false;
                 lblMessage.Visible = false;
+                lblFullScreenMessage.Visible = false;
+                tmrCountDown.Stop();
+                CountDown = 5;
                 if (RecordFullscreen)
                 {
                     this.WindowState = FormWindowState.Minimized;
                     lblFullScreenMessage.Visible = false;
                 }
+
                 Record();
             }
         }
@@ -415,6 +435,12 @@ namespace Win_Recorder
         {
             tmrCountDown.Enabled = false;
             tmrCountDown.Dispose();
+            
+            if (IsRecording)
+            {
+                videoCaptureDevice.Stop();
+            }
+
             Application.Exit();
         }
         
@@ -456,6 +482,40 @@ namespace Win_Recorder
                 }
             }
         }
-       
+
+        //Start Web Cam Code
+
+        internal void StartWebCam(string WebCamName)
+        {
+            videoCaptureDevice = new VideoCaptureDevice();
+            videoCaptureDevice = new VideoCaptureDevice(filterInfoCollection[cboCameras.SelectedIndex].MonikerString);
+            videoCaptureDevice.NewFrame += VideoCaptureDevice_NewFrame;
+            videoCaptureDevice.Start();
+            webCam1.Visible = true;
+        }
+
+        private void VideoCaptureDevice_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        {
+            try
+            {
+                webCam1.Image = (Bitmap)eventArgs.Frame.Clone();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void frmRecorder_MouseEnter(object sender, EventArgs e)
+        {
+            this.TopMost = true;
+        }
+
+        private void cboCameras_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CallToolbarForm("CameraIndex_" + cboCameras.SelectedItem);
+        }
+
     }
 }

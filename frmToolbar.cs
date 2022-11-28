@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using AForge.Video.DirectShow;
+using System;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Win_Recorder
 {
     public partial class frmToolbar : Form
     {
-
         private frmRecorder mainForm = null;
         private String videoFolder;
 
@@ -22,11 +17,34 @@ namespace Win_Recorder
         public bool MicrophoneOn { get; private set; }
         public bool IsRecording { get; private set; }
 
+        //Web Cam Variables
+        FilterInfoCollection filterInfoCollection;
+        VideoCaptureDevice videoCaptureDevice;
+
+        public delegate void SetValueDelegate(string value);
+        public SetValueDelegate CallWebCamForm;
+
         public frmToolbar(Form callingForm)
         {
             //create a instace of frmRecord to access it using mainform
             mainForm = callingForm as frmRecorder;
             InitializeComponent();
+            frmWebCam frmWCam = new frmWebCam(this);
+            this.CallWebCamForm += new SetValueDelegate(frmWCam.SetValueCallback);
+        }
+
+        private void frmToolbar_Load(object sender, EventArgs e)
+        {
+            LoadRecentVideos();
+            filterInfoCollection = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            foreach (FilterInfo filterInfo in filterInfoCollection)
+            {
+                cboCameras.Items.Add(filterInfo.Name);
+            }
+            this.Top += 40;
+            this.Left += 20;
+            cboCameras.SelectedIndex = 0;
+            videoCaptureDevice = new VideoCaptureDevice();
         }
 
         private void LoadRecentVideos()
@@ -63,8 +81,10 @@ namespace Win_Recorder
             var itemText = (sender as ToolStripMenuItem).Text;
 
             if (itemText == "Recent Videos") { return; }
-
-            Process.Start(Properties.Settings.Default._VideoFolder + "\\" + itemText);
+            if (File.Exists(Properties.Settings.Default._VideoFolder + "\\" + itemText))
+            {
+                Process.Start(Properties.Settings.Default._VideoFolder + "\\" + itemText);
+            }
         }
 
         private static string[] GetFiles(string path)
@@ -108,7 +128,6 @@ namespace Win_Recorder
         private void btnSaveVideo_Click(object sender, EventArgs e)
         {
             if (frmRecorder.IsRecording) { return; }
-           
         }
 
         private void btnSaveVideoPath_Click(object sender, EventArgs e)
@@ -166,6 +185,7 @@ namespace Win_Recorder
                     Properties.Settings.Default._ElapsedTime = TimeSpan.Zero;
                     Properties.Settings.Default.Save();
                     IsRecording = false;
+                    //mainForm.CountDown == 5;
                     mainForm.CleanupResources();
                     break;
 
@@ -198,16 +218,16 @@ namespace Win_Recorder
             Application.Exit();
         }
 
-        private void frmToolbar_Load(object sender, EventArgs e)
-        {
-            LoadRecentVideos();
-        }
-
         private void customSizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             mnuCustomSize.Checked = true;
             mnuFullScreen.Checked = false;
             mainForm.RecordFullscreen = false;
+
+            if (ckbUseWebCam.Checked)
+            {
+                btnStartWebCam.PerformClick();
+            }
         }
 
         private void fullScreenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -215,6 +235,11 @@ namespace Win_Recorder
             mnuCustomSize.Checked = false;
             mnuFullScreen.Checked = true;
             mainForm.RecordFullscreen = true;
+
+            if (ckbUseWebCam.Checked)
+            {
+                btnStartWebCam.PerformClick();
+            }
         }
 
         private void frmToolbar_KeyDown(object sender, KeyEventArgs e)
@@ -244,13 +269,19 @@ namespace Win_Recorder
         /// <param name="v"></param>
         public void SetValueCallback(string v)
         {
-            if (mnuCustomSize.Checked) { return; }
+            //if (mnuCustomSize.Checked) { return; }
+
+            if (v.StartsWith("CameraIndex"))
+            {
+                String[] index = v.Split('_');
+                cboCameras.SelectedItem = index[1];
+                return;
+            }
 
             switch (v)
             {
                 case "Normal":
                     mainForm.WindowState = FormWindowState.Minimized;
-                    //if (IsRecording) { btnStartStop.PerformClick(); }
                     btnStartStop.PerformClick();
                     this.WindowState = FormWindowState.Normal;
                     break;
@@ -258,6 +289,8 @@ namespace Win_Recorder
                 case "Minimized":
                     mainForm.WindowState = FormWindowState.Normal;
                     break;
+
+
 
                 default:
                     break;
@@ -272,6 +305,63 @@ namespace Win_Recorder
         private void labelTimestamp_TextChanged(object sender, EventArgs e)
         {
             mainForm.Activate();
+        }
+
+        private void btnStartWebCam_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!ckbUseWebCam.Checked) { MessageBox.Show("Please check the Use Web Camera Checkbox to enable camera usage", "Camera not enabled", MessageBoxButtons.OK); return; }
+
+                if (mnuFullScreen.Checked) //use external form
+                {
+                    CallWebCamForm("EnableWebCam");
+                    mainForm.webCam1.Visible = false;
+
+                }
+                else
+                {
+                    CallWebCamForm("DisableWebCam");
+                    //Use recorder forms Web Cam picturebox
+                    mainForm.StartWebCam(cboCameras.SelectedItem.ToString());
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void frmToolbar_MouseEnter(object sender, EventArgs e)
+        {
+            this.TopMost = true;
+        }
+
+        private void cboCameras_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CallWebCamForm("CameraIndex__" + cboCameras.SelectedIndex);
+            mainForm.SetCboIndex(cboCameras.SelectedIndex);
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void ckbUseWebCam_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckbUseWebCam.Checked == false)
+            {
+                mainForm.DiableWebCam(); 
+                CallWebCamForm("DisableWebCam");
+            }
+            else { btnStartWebCam.PerformClick(); }
+        }
+
+        private void mnuRecentVideos_MouseEnter(object sender, EventArgs e)
+        {
+            LoadRecentVideos();
         }
     }
 }
