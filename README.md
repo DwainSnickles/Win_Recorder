@@ -27,5 +27,6 @@ Both camera controls can be moved and resisized as desired.
 Recent Videos gets updated automatically to prevent file not found when files are deleted.
 Fixed a few bugs found while troubleshooting.
 
+![WinRecorderPIP](https://user-images.githubusercontent.com/26853477/204947570-4c92e8f2-a5ec-49ee-a6ba-2c05791618c5.png)
 
-![WinRecorderPIP](https://user-images.githubusercontent.com/26853477/204947431-9334fe60-ebde-471e-99b5-62c295c4ac57.png)
+
