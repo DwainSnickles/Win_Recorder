@@ -12,8 +12,6 @@ namespace Win_Recorder
         public static bool isRecording;
         private frmToolbar TbarForm = null;
 
-        Boolean FormShown = false;
-
         FilterInfoCollection filterInfoCollection;
         VideoCaptureDevice videoCaptureDevice;
 

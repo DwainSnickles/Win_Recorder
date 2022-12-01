@@ -110,7 +110,7 @@ namespace Win_Recorder
             BeginInvoke(((Action)(() =>
             {
                 string filePath = e.FilePath;
-                //this.labelStatus.Text = "Completed";
+                CallToolbarForm("msg_Recording Completed");
                 Properties.Settings.Default._isRecording = false;
                 Properties.Settings.Default.Save();
                 CleanupResources();
@@ -123,6 +123,7 @@ namespace Win_Recorder
             {
                 Properties.Settings.Default._isRecording = false;
                 Properties.Settings.Default.Save();
+                CallToolbarForm("msg_Recording Failed");
                 CleanupResources();
             })));
         }
@@ -243,6 +244,7 @@ namespace Win_Recorder
             cboCameras.SelectedIndex = 0;
             videoCaptureDevice = new VideoCaptureDevice();
             ControlMoverOrResizer.Init(webCam1);
+            CallToolbarForm("msg_Recorder Ready");
         }
 
         public void PauseVideo()
@@ -251,7 +253,8 @@ namespace Win_Recorder
           
                 if (_rec.Status == RecorderStatus.Paused)
                 {
-                    _rec.Resume();
+                CallToolbarForm("msg_Video No Longer Paused");
+                _rec.Resume();
                     return;
                 }
             _rec.Pause();
@@ -261,11 +264,13 @@ namespace Win_Recorder
         {
             webCam1.Visible = false;
             videoCaptureDevice.Stop();
+            CallToolbarForm("msg_WebCan Disabled");
         }
 
         internal void EnableWebCam()
         {
             webCam1.Visible = true;
+            //CallToolbarForm("msg_Recording Completed");
         }
 
         internal void Record()
@@ -283,7 +288,7 @@ namespace Win_Recorder
             }
             
             UpdateProgress();
-
+            CallToolbarForm("msg_Recording Started");
             String videoName = Properties.Settings.Default._VideoName;
 
             if (Properties.Settings.Default._VideoName == "VideoName")
@@ -365,6 +370,7 @@ namespace Win_Recorder
                 if (cboCameras.SelectedIndex > -1)
                 {
                     cboCameras.SelectedIndex = cboIndex;
+                    CallToolbarForm("msg_Camera Changed " + cboCameras.SelectedItem.ToString() );
                 }
             }
             catch (Exception)
@@ -388,6 +394,7 @@ namespace Win_Recorder
                 this.Location = new Point(formStartPosition.X, formStartPosition.Y);
                 this.Size = new Size(600, 400);
                 lblFullScreenMessage.Visible = true;
+                CallToolbarForm("msg_Recorder Is Set For Fullscreen");
             }
             else
             {
@@ -396,6 +403,7 @@ namespace Win_Recorder
                 ScreenWidth = ScreenRectangle.Width;
                 ScreenHeight = ScreenRectangle.Height;
                 lblFullScreenMessage.Visible = false;
+                CallToolbarForm("msg_Recorder Will Use Form For Video");
             }
             SetWindowLong(this.Handle, GWL_EXSTYLE, GetWindowLong(this.Handle, GWL_EXSTYLE) | WS_EX_TRANSPARENT);
             lblCountDown.Visible = true;
@@ -492,6 +500,7 @@ namespace Win_Recorder
             videoCaptureDevice.NewFrame += VideoCaptureDevice_NewFrame;
             videoCaptureDevice.Start();
             webCam1.Visible = true;
+            CallToolbarForm("msg_Forms WebCam Active");
         }
 
         private void VideoCaptureDevice_NewFrame(object sender, NewFrameEventArgs eventArgs)

@@ -45,6 +45,12 @@ namespace Win_Recorder
             this.Left += 20;
             cboCameras.SelectedIndex = 0;
             videoCaptureDevice = new VideoCaptureDevice();
+            if (cboCameras.SelectedIndex != -1)
+            {
+                cboCameras.SelectedIndex = 0;
+                lblStatus.Text = "Camera Found";
+            }
+            else { lblStatus.Text = "No Cameras Found";  cboCameras.Enabled = false; }
         }
 
         private void LoadRecentVideos()
@@ -73,6 +79,10 @@ namespace Win_Recorder
                     mnuRecentVideos.DropDownItems.Add("No videos found");
                 }
             }
+
+            lblStatus.Text = Videos.Count().ToString() + " Videos Found";
+           
+
         }
 
         //starts the default pcs video player
@@ -83,6 +93,7 @@ namespace Win_Recorder
             if (itemText == "Recent Videos") { return; }
             if (File.Exists(Properties.Settings.Default._VideoFolder + "\\" + itemText))
             {
+                lblStatus.Text = "Loading Video";
                 Process.Start(Properties.Settings.Default._VideoFolder + "\\" + itemText);
             }
         }
@@ -105,12 +116,14 @@ namespace Win_Recorder
                     Properties.Settings.Default._SpeakersOn = false;
                     btnSpeaker.NormalImage = Properties.Resources.SpeakerMute;
                     SpeakersOn = false;
+                    lblStatus.Text = "Speakers Muted";
                     break;
 
                 case false:
                     Properties.Settings.Default._SpeakersOn = true;
                     btnSpeaker.NormalImage = Properties.Resources.SpeakerOn;
                     SpeakersOn = true;
+                    lblStatus.Text = "Speakers Ready To Use";
                     break;
 
                 default:
@@ -123,6 +136,7 @@ namespace Win_Recorder
         private void btnPause_Click(object sender, EventArgs e)
         {
             mainForm.PauseVideo();
+            lblStatus.Text = "Video Paused";
         }
 
         private void btnSaveVideo_Click(object sender, EventArgs e)
@@ -155,12 +169,14 @@ namespace Win_Recorder
                     Properties.Settings.Default._MicOn = false;
                     btnMic.NormalImage = Properties.Resources.MicMute;
                     MicrophoneOn = false;
+                    lblStatus.Text = "Microphone Muted";
                     break;
 
                 case false:
                     Properties.Settings.Default._MicOn = true;
                     btnMic.NormalImage = Properties.Resources.micOn;
                     MicrophoneOn = true;
+                    lblStatus.Text = "Microphone Ready To Use";
                     break;
 
                 default:
@@ -187,6 +203,7 @@ namespace Win_Recorder
                     IsRecording = false;
                     //mainForm.CountDown == 5;
                     mainForm.CleanupResources();
+                    lblStatus.Text = "Recorder Stopped";
                     break;
 
                 case "Start":
@@ -199,6 +216,7 @@ namespace Win_Recorder
                     btnStartStop.Tag = "Stop";
                     btnStartStop.NormalImage = Properties.Resources.RecStarted;
                     tmrElapsedTime.Enabled = true;
+                    lblStatus.Text = "Preparing To Start Recording";
                     //Turn off form move and resize this sub will start recorder after that
                     mainForm.AllowResizing();
                     break;
@@ -224,6 +242,8 @@ namespace Win_Recorder
             mnuFullScreen.Checked = false;
             mainForm.RecordFullscreen = false;
 
+            lblStatus.Text = "Custom Form For Video";
+
             if (ckbUseWebCam.Checked)
             {
                 btnStartWebCam.PerformClick();
@@ -235,6 +255,8 @@ namespace Win_Recorder
             mnuCustomSize.Checked = false;
             mnuFullScreen.Checked = true;
             mainForm.RecordFullscreen = true;
+
+            lblStatus.Text = "Video Will Be recorded Using Fullscreen";
 
             if (ckbUseWebCam.Checked)
             {
@@ -269,12 +291,17 @@ namespace Win_Recorder
         /// <param name="v"></param>
         public void SetValueCallback(string v)
         {
-            //if (mnuCustomSize.Checked) { return; }
+            if (v.StartsWith("msg")) 
+            {
+                String[] message = v.Split('_');
+                lblStatus.Text = message[1];
+            }
 
             if (v.StartsWith("CameraIndex"))
             {
                 String[] index = v.Split('_');
                 cboCameras.SelectedItem = index[1];
+                lblStatus.Text = cboCameras.SelectedItem.ToString() + "In Use";
                 return;
             }
 
@@ -353,6 +380,7 @@ namespace Win_Recorder
         {
             if (ckbUseWebCam.Checked == false)
             {
+                lblStatus.Text = "Web Cam Disabled";
                 mainForm.DiableWebCam(); 
                 CallWebCamForm("DisableWebCam");
             }
