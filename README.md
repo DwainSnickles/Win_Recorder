@@ -19,6 +19,7 @@ Note Only the area inside the blue rectangle is recorded in Custom Mode.
 
 11/30/20022 Added Several New Features:
 
+Updated Toolbar
 Now has P Hotkey to allow pause while in fullscreen mode.
 Allows end user to include their PC Cam in video.
 Seperate form for camera while in fullscreen mode.
@@ -26,5 +27,5 @@ Both camera controls can be moved and resisized as desired.
 Recent Videos gets updated automatically to prevent file not found when files are deleted.
 Fixed a few bugs found while troubleshooting.
 
-![WinRecorderPIP](https://user-images.githubusercontent.com/26853477/204930952-9c55f8ac-5f36-4c08-b4bf-9d184992525e.png)
 
+![WinRecorderPIP](https://user-images.githubusercontent.com/26853477/204947431-9334fe60-ebde-471e-99b5-62c295c4ac57.png)
